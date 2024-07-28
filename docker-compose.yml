@@ -33,11 +33,9 @@ services:
     build: .
     tty: true
 #    command: sh -c "python3 manage.py migrate && python3 manage.py csu &&
-#    python3 manage.py collectstatic --noinput && python3 manage.py load_data &&
 #    python3 manage.py runserver 0.0.0.0:8000"
-    command: sh -c "python3 manage.py migrate 
+    command: sh -c "python3 manage.py migrate
       && python3 manage.py csu 
-      && python3 manage.py load_data 
       && python3 manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
@@ -56,6 +54,7 @@ services:
     command: sh -c "sleep 5 && celery -A config worker -l info"
     volumes:
       - .:/app
+    restart: unless-stopped       #on-failure
     env_file:
       - .env
     depends_on:
