@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "gp-documentprocessing"
+version = "0.1.0"
+description = ""
+authors = ["ZhenyaKasatkina <knopisha@list.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11"
+django = "^5.0.7"
+psycopg2-binary = "^2.9.9"
+pillow = "^10.4.0"
+djangorestframework = "^3.15.2"
+python-dotenv = "^1.0.1"
+djangorestframework-simplejwt = "^5.3.1"
+celery = "^5.4.0"
+redis = "^5.0.7"
+drf-yasg = "^1.21.7"
+django-cors-headers = "^4.4.0"
+coverage = "^7.6.0"
+flake8 = "^7.1.0"
+black = "^24.4.2"
+isort = "^5.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
