@@ -42,16 +42,19 @@ class UsersTestCase(APITestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_retrieve(self):
+    def test_retrieve_is_true(self):
         """Проверка детализации"""
 
-        url = reverse("users:user-detail", args=(self.user.pk,))
+        url = reverse("users:user_view", args=(self.user.pk,))
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data.get("email"), self.user.email)
 
-        url = reverse("users:user-detail", args=(101,))
+    def test_retrieve_is_false(self):
+        """Проверка детализации (с ошибкой)"""
+
+        url = reverse("users:user_view", args=(101,))
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -60,36 +63,54 @@ class UsersTestCase(APITestCase):
     def test_create_is_true(self):
         """Проверка создания пользователя"""
 
-        url = reverse("users:user-list")
+        url = reverse("users:user_create")
         data = {"email": "create@list.ru", "password": "qwe"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.all().count(), 2)
 
     def test_create_is_false(self):
-        """Проверка создания пользователя"""
+        """Проверка создания пользователя (с ошибкой)"""
 
-        url = reverse("users:user-list")
+        url = reverse("users:user_create")
         data = {"email": "create@list.ru"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.all().count(), 1)
 
+    def test_update_is_true(self):
+        """Проверка изменения пользователя"""
+
+        url = reverse("users:user_update", args=(self.user.pk,))
+        data = {"email": "new_email@list.ru", "password": "123q", "town": "City"}
+
+        response = self.client.put(url, data)
+        data = response.json()
+        result = {
+                "id": self.user.pk,
+                "email": self.user.email,
+                "phone": None,
+                "town": "City",
+                "avatar": None
+            }
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data, result)
+
     def test_update_is_false(self):
         """Проверка изменения пользователя (с ошибкой)"""
 
-        url = reverse("users:user-detail", args=(self.user.pk,))
-        data = {"email": "create@list.ru", "password": ""}
-        response = self.client.put(url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        url = reverse("users:user_update", args=(102,))
+        data = {"email": "new_email@list.ru", "password": "123q", "town": "City"}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            response.json(), {"password": ["This field may not be blank."]}
+            response.json(), {"detail": "No User matches the given query."}
         )
 
     def test_delete_is_true(self):
         """Проверка удаления пользователя (без ошибки)"""
 
-        url = reverse("users:user-detail", args=(self.user.pk,))
+        url = reverse("users:user_delete", args=(self.user.pk,))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(User.objects.all().count(), 0)
@@ -97,23 +118,7 @@ class UsersTestCase(APITestCase):
     def test_delete_is_false(self):
         """Проверка удаления пользователя (с ошибкой)"""
 
-        url = reverse("users:user-detail", args=(not self.user.pk,))
+        url = reverse("users:user_delete", args=(103,))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(User.objects.all().count(), 1)
-
-    def test_list(self):
-        """Проверка списка пользователей"""
-
-        url = reverse("users:user-list")
-        response = self.client.get(url)
-        data = response.json()
-        result = [
-            {
-                "id": self.user.pk,
-                "email": self.user.email,
-                "phone": None,
-            },
-        ]
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(data, result)

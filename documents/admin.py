@@ -4,18 +4,22 @@ from documents.models import Document
 from documents.tasks import send_email_about_changes_in_document_status
 
 
-@admin.action(description="Изменить статус документа на Принято")
+@admin.action(description="Изменить статус документа на Принят")
 def is_accepted(modeladmin, request, queryset):
-    queryset.update(status="Принят")
     for document in queryset:
-        send_email_about_changes_in_document_status.delay(document.pk)
+        if document.status in ["Загружен", "Отклонен"]:
+            document.status = "Принят"
+            document.save()
+            send_email_about_changes_in_document_status.delay(document.pk)
 
 
 @admin.action(description="Изменить статус документа на Отклонен")
 def is_rejected(modeladmin, request, queryset):
-    queryset.update(status="Отклонен")
     for document in queryset:
-        send_email_about_changes_in_document_status.delay(document.pk)
+        if document.status in ["Загружен", "Принят"]:
+            document.status = "Отклонен"
+            document.save()
+            send_email_about_changes_in_document_status.delay(document.pk)
 
 
 @admin.register(Document)
