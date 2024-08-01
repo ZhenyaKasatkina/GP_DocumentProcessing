@@ -1,39 +1,28 @@
-from rest_framework.permissions import AllowAny
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import (DestroyAPIView, UpdateAPIView,
+                                     CreateAPIView, RetrieveAPIView)
 
 from users.models import User
-from users.permissions import IsRealUser
-from users.serializers import UserOtherSerializer, UserSerializer
+from users.serializers import UserSerializer, UserFullSerializer
 
 
-class UserViewSet(ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class UserCreateAPIView(CreateAPIView):
+    serializer_class = UserFullSerializer
 
     def perform_create(self, serializer):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
         user.save()
 
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = (AllowAny,)
-        if self.action in ["destroy", "update", "partial_update"]:
-            self.permission_classes = (IsRealUser,)
-        return super().get_permissions()
 
-    def get_serializer_class(self):
-        if getattr(self, "swagger_fake_view", False):
-            return UserSerializer
-        if self.action == "create":
-            return UserSerializer
-        if self.action == "list":
-            return UserOtherSerializer
-        if self.action == "retrieve":
-            if self.get_object() == self.request.user:
-                return UserSerializer
-            else:
-                return UserOtherSerializer
-        if self.action in ["update", "partial_update"]:
-            if self.get_object() == self.request.user:
-                return UserSerializer
+class UserRetrieveAPIView(RetrieveAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+
+class UserUpdateAPIView(UpdateAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+
+class UserDestroyAPIView(DestroyAPIView):
+    queryset = User.objects.all()
