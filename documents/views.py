@@ -1,6 +1,9 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView, ListAPIView
 
 from documents.models import Document
+from documents.paginators import Pagination
 from documents.serializers import DocumentSerializer
 from documents.tasks import send_email_about_new_document
 
@@ -8,6 +11,19 @@ from documents.tasks import send_email_about_new_document
 class DocumentListAPIView(ListAPIView):
     serializer_class = DocumentSerializer
     queryset = Document.objects.all()
+    pagination_class = Pagination
+
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+    )
+    filterset_fields = (
+        "status",
+        "owner",
+    )
+    search_fields = ("name", "description",)
+    ordering_fields = ("created_at",)
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
