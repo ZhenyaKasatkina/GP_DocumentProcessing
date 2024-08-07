@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_yasg",
     "corsheaders",
+    "django_filters",
+
     "users",
     "documents",
 ]
@@ -63,6 +65,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = "config.urls"
 
 REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ),
     # Настройки JWT-токенов
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",

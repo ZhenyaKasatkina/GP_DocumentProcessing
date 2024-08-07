@@ -33,7 +33,14 @@ class DocumentsTestCase(APITestCase):
         url = reverse("documents:document_list")
         response = self.client.get(url)
         data = response.json()
-        result = [self.response.json()]
+        result = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                self.response.json()
+            ],
+        }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
 
@@ -44,7 +51,14 @@ class DocumentsTestCase(APITestCase):
         url = reverse("documents:document_list")
         response = self.client.get(url)
         data = response.json()
-        result = [self.response.json()]
+        result = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                self.response.json()
+            ],
+        }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
 

@@ -1,11 +1,13 @@
 from rest_framework import serializers
 
 from documents.models import Document
+from documents.validators import validate_size
 from users.serializers import UserSerializer
 
 
 class DocumentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    file = serializers.FileField(validators=[validate_size])
 
     def validate(self, attrs):
 
