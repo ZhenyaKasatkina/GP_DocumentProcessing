@@ -18,10 +18,7 @@ class DocumentListAPIView(ListAPIView):
         SearchFilter,
         OrderingFilter,
     )
-    filterset_fields = (
-        "status",
-        "owner",
-    )
+    filterset_fields = ("status", "owner",)
     search_fields = ("name", "description",)
     ordering_fields = ("created_at",)
 
@@ -33,7 +30,7 @@ class DocumentListAPIView(ListAPIView):
             queryset = queryset.filter(owner=self.request.user)
             return queryset
         else:
-            return []
+            return queryset.none()
 
 
 class DocumentCreateAPIView(CreateAPIView):
